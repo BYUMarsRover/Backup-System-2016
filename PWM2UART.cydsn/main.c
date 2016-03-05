@@ -11,31 +11,47 @@
 */
 #include <project.h>
 #define COUNTER_RESET 0
+CY_ISR_PROTO(timer1); 
 
-int main()
-{
+
+int main(){
     CyGlobalIntEnable; /* Enable global interrupts. */
-    Counter_Start(); 
+    Timer_1_Start(); 
+    PWM_1_Start(); 
+    high_StartEx(timer1); 
     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
-   int last_test = 0; 
-int pwm_counter; 
+    /*int j = 20000; //period
+    int k = 10000; //compare value
+    volatile int l;*/
     for(;;)
-    {
-        //if interrupt turns off 
-            //record counter number
-            //clear counter
-            //reset interrupt_test
-        //else
-            //grab current interrupt_test value
-        int current_test = Start_Stop_Read(); 
-        if((last_test > 0) && (current_test == 0)){
-            pwm_counter = Counter_ReadCounter(); 
-            Counter_WriteCounter(COUNTER_RESET); 
-            last_test = current_test; 
+    { 
+       /*if( j > 10000){
+            j -= 2000; 
+            k -= 1000;         
         }else{
-            last_test = current_test; 
+            j = 20000; 
+            k = 10000; 
         }
+        PWM_1_WritePeriod(j); 
+        PWM_1_WriteCompare(k); 
+        l = Timer_1_ReadCounter(); */
     }
+}
+
+CY_ISR(timer1){
+    Timer_1_ReadStatusRegister(); //clears interrupt
+    volatile static int i = 0; 
+    volatile static int j[10]; 
+    if(i < 10){
+      j[i] = Timer_1_ReadCounter(); 
+      i++; 
+    }else{
+      i=0; 
+      j[i] = Timer_1_ReadCapture(); 
+    }
+    //Timer_1_Init(); 
+   .// Reset_Write(1); 
+    //Reset_Write(0); 
 }
 
 /* [] END OF FILE */
