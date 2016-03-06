@@ -29,31 +29,35 @@ int main(){
     volatile int l;
     for(;;)
     { 
-       /*if( j > 10000){
-            j -= 2000; 
-            k -= 1000;         
-        }else{
-            j = 20000; 
-            k = 10000; 
-        }
-        PWM_1_WritePeriod(j); 
-        PWM_1_WriteCompare(k); */
-       /* l = Timer_1_ReadCounter(); 
-        if(l < 10){
-         l = 0;    
-        }*/
+    
     }
 }
-//works inconsisently
+//every other capture has *good* data
+//the good data is sometime the pulse, and sometimes the deadban and somtimes some funky negative crap
+//try looking at the one shot with halting on interrupt
+//look at code example that is recommended when you right click on the component
+//
 CY_ISR(timer1){
     Timer_1_ReadStatusRegister(); //clears interrupt
+    static int j[5]; 
+    static int i = 0;
+    int out; 
     if(rise == 0){
         rise = Timer_1_ReadCapture(); 
         Timer_1_ClearFIFO(); 
     }else{
         fall = Timer_1_ReadCapture();
-        volatile int out = rise - fall; 
+        out = rise - fall; 
         rise = 0; 
+    }
+    
+    if(i < 6){
+     j[i] = out;  
+     i++; 
+    }else{
+     i = 0; 
+     j[i] = 0; 
+     i++; 
     }
 }
 //this doesn't run which is correct
