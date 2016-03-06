@@ -12,7 +12,9 @@
 #include <project.h>
 #define COUNTER_RESET 0
 CY_ISR_PROTO(timer1); 
-CY_ISR_PROTO(pwm1); 
+CY_ISR_PROTO(isr1); 
+volatile int rise = 0; 
+volatile int fall = 0; 
 
 
 int main(){
@@ -20,7 +22,7 @@ int main(){
     Timer_1_Start(); 
     PWM_1_Start(); 
     high_StartEx(timer1); 
-    pwm_StartEx(pwm1); 
+    isr_1_StartEx(isr1); 
     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
     /*int j = 20000; //period
     int k = 10000; //compare value*/
@@ -36,32 +38,26 @@ int main(){
         }
         PWM_1_WritePeriod(j); 
         PWM_1_WriteCompare(k); */
-        l = Timer_1_ReadCounter(); 
+       /* l = Timer_1_ReadCounter(); 
         if(l < 10){
          l = 0;    
-        }
+        }*/
     }
 }
 //works inconsisently
 CY_ISR(timer1){
     Timer_1_ReadStatusRegister(); //clears interrupt
-    volatile static int i = 0; 
-    volatile static int j[10]; 
-    if(i < 10){
-      j[i] = Timer_1_ReadCounter(); 
-      i++; 
+    if(rise == 0){
+        rise = Timer_1_ReadCapture(); 
+        Timer_1_ClearFIFO(); 
     }else{
-      i=0; 
-      j[i] = Timer_1_ReadCapture(); 
+        fall = Timer_1_ReadCapture();
+        volatile int out = rise - fall; 
+        rise = 0; 
     }
-    Timer_1_Init(); 
-    //Reset_Write(1); 
-    //Reset_Write(0); 
 }
-
-CY_ISR(pwm1){
-    PWM_1_ReadStatusRegister(); 
-    volatile int i = 0; 
-    i++; 
+//this doesn't run which is correct
+CY_ISR(isr1){
+    __NOP; 
 }
 /* [] END OF FILE */
