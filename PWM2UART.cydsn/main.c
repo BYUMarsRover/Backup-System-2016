@@ -38,25 +38,18 @@ int main(){
 //look at code example that is recommended when you right click on the component
 //
 CY_ISR(timer1){
+    
     Timer_1_ReadStatusRegister(); //clears interrupt
+    volatile uint16 x = Timer_1_ReadCapture(); 
     static int j[5]; 
     static int i = 0;
-    int out; 
-    if(rise == 0){
-        rise = Timer_1_ReadCapture(); 
-        Timer_1_ClearFIFO(); 
-    }else{
-        fall = Timer_1_ReadCapture();
-        out = rise - fall; 
-        rise = 0; 
-    }
     
     if(i < 6){
-     j[i] = out;  
+     j[i] = x;  
      i++; 
     }else{
      i = 0; 
-     j[i] = 0; 
+     j[i] = x; 
      i++; 
     }
 }
