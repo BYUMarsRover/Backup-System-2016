@@ -32,11 +32,8 @@ int main(){
     
     }
 }
-//every other capture has *good* data
-//the good data is sometime the pulse, and sometimes the deadban and somtimes some funky negative crap
-//try looking at the one shot with halting on interrupt
-//look at code example that is recommended when you right click on the component
-//
+
+//value varies between 1200-2100
 CY_ISR(timer1){
     
     Timer_1_ReadStatusRegister(); //clears interrupt
